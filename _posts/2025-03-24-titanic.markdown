@@ -4,4 +4,119 @@ title:  "타이타닉 모델 훈련"
 date:   2025-03-24 23:05:00 +0900
 categories: Machine Learning
 ---
-## 타이타닉 데이터 모델을 훈련
+
+```python
+from pathlib import Path
+import tarfile
+import urllib.request
+import pandas as pd
+
+def load_titanic_data():
+    tarball_path = Path("datasets/titanic.tgz")
+    if not tarball_path.is_file():
+        Path("datasets").mkdir(parents=True, exist_ok=True)
+        url = "https://github.com/ageron/data/raw/main/titanic.tgz"
+        urllib.request.urlretrieve(url, tarball_path)
+        with tarfile.open(tarball_path) as titanic_tarball:
+            titanic_tarball.extractall(path="datasets")
+    return [pd.read_csv(Path("datasets/titanic") / filename)
+            for filename in ("train.csv", "test.csv")]
+
+train_data, test_data = load_titanic_data()
+```
+
+
+```python
+train_data = train_data.set_index("PassengerId")
+test_data = test_data.set_index("PassengerId")
+```
+훈련 데이터셋과 테스트 데이터셋의 index를 PassengerId로 설정한다.
+
+
+```python
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder
+
+num_pipeline = Pipeline([("impute", SimpleImputer(strategy="median")), 
+							("standard", StandardScaler())])
+
+cat_pipeline = Pipeline([
+        ("ordinal_encoder", OrdinalEncoder()),
+        ("impute", SimpleImputer(strategy="most_frequent")),
+        ("cat_encoder", OneHotEncoder(sparse_output=False)),
+    ])
+
+```
+
+
+```python
+num_attributes = ["Age", "SibSp", "Parch", "Fare"]
+cat_attributes = ["Pclass", "Sex", "Embarked"]
+
+```
+수치형, 범주형 데이터를 구분한다.
+Pclass를 PClass라고 작성하여 열을 찾지 못하였음.
+대소문자 구별을 잘 해야한다.
+
+
+```python
+from sklearn.compose import ColumnTransformer
+preprocess_pipe = ColumnTransformer([
+        ("num", num_pipeline, num_attributes),
+        ("cat", cat_pipeline, cat_attributes),
+    ])
+```
+
+
+```python
+X_train = preprocess_pipe.fit_transform(train_data)
+y_train = train_data['Survived']
+```
+
+```python
+from sklearn.ensemble import RandomForestClassifier
+rforest = RandomForestClassifier(n_estimators=100, random_state=42)
+rforest.fit(X_train, y_train)
+```
+
+
+```python
+X_test = preprocess_pipe.transform(test_data)
+y_pred = rforest.predict(X_test)
+```
+
+
+```python
+from sklearn.model_selection import cross_val_score
+forest_scores = cross_val_score(rforest, X_train, y_train, cv=10)
+forest_scores.mean()
+```
+np.float64(0.8137578027465668)
+검증결과로 나온 점수들의 평균값은 81점이다. 
+
+<h1>
+
+cv가 커지면?
+- 데이터셋을 더 많은 폴드로 나눠서 폴드의 데이터 크기가 작아짐.
+- 특정 데이터에 과적합될 가능성이 있음
+<h1>
+
+```python
+import numpy as np
+
+dt_solution = pd.DataFrame(y_pred, test_data.index, columns=["Survived"])
+
+dt_solution.to_csv('out.csv', index=True)
+```
+PassengerId와 테스트셋 결과값을 불러와서 PassengerId열과 Survived열을 만들어서 CSV로 저장하며 마무리한다.
+
+
+위 방식은 랜덤 포레스트 모델을 사용하여 데이터를 훈련시킨 방식이다.
+다른 모델을 사용할경우, 교차검증결과값과 Kaggle에서 점수가 얼마나 나오는지 테스트를 해보는게 좋을것같다.
+
+
+![result](https://kmg9971.github.io/_posts/2025-03-24-titanic/result.jpg)
+
+위 모델로는 캐글에서 0.75점을 받았다
