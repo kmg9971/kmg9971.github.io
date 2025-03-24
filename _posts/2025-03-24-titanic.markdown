@@ -93,7 +93,7 @@ from sklearn.model_selection import cross_val_score
 forest_scores = cross_val_score(rforest, X_train, y_train, cv=10)
 forest_scores.mean()
 ```
-np.float64(0.8137578027465668)
+np.float64(0.8137578027465668)   
 검증결과로 나온 점수들의 평균값은 81점이다. 
 
 
