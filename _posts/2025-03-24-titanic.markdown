@@ -116,6 +116,6 @@ PassengerId와 테스트셋 결과값을 불러와서 PassengerId열과 Survived
 다른 모델을 사용할경우, 교차검증결과값과 Kaggle에서 점수가 얼마나 나오는지 테스트를 해보는게 좋을것같다.
 
 
-![result](https://kmg9971.github.io/_posts/2025-03-24-titanic/result.jpg)
+![result](https://kmg9971.github.io/attachments/2025-03-24-titanic/result.jpg)
 
 위 모델로는 캐글에서 0.75점을 받았다
