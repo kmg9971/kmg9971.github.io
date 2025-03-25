@@ -29,10 +29,12 @@ url: "https://kmg9971.github.io" # the base hostname & protocol for your site, e
 github_username:  kmg9971
 
 # Build settings
-theme: minima
+#theme: minima
+remote_theme: "mmistakes/minimal-mistakes@4.26.2"
 # remote_theme: "mmistakes/minimal-mistakes"
 plugins:
   - jekyll-feed
+  - jekyll-include-cache
 
 
 # Exclude from processing.
