@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: posts
 title:  "타이타닉 모델 훈련"
 date:   2025-03-24 23:05:00 +0900
 categories: "Machine Learning"
