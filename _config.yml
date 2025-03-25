@@ -30,7 +30,8 @@ github_username:  kmg9971
 
 # Build settings
 #theme: minima
-remote_theme: "mmistakes/minimal-mistakes@4.26.2"
+#remote_theme: "mmistakes/minimal-mistakes@4.26.2"
+theme: minimal-mistakes-jekyll
 # remote_theme: "mmistakes/minimal-mistakes"
 plugins:
   - jekyll-feed
